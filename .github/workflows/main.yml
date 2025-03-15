@@ -1,0 +1,44 @@
+name: Deploy React App to Azure
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch (you can adjust this)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # This will use an Ubuntu runner for the build process
+
+    steps:
+    # Step 1: Checkout the code from your GitHub repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Step 2: Set up Node.js (specify the version that matches your React app's requirements)
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'  # Replace with the required version of Node.js
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: |
+        npm install
+
+    # Step 4: Build the React app
+    - name: Build React app
+      run: |
+        npm run build
+
+    # Step 5: Log in to Azure using Service Principal
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+
+    # Step 6: Deploy the React app to Azure App Service
+    - name: Deploy to Azure App Service
+      run: |
+        az webapp deploy --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_APP_NAME }} --src-path ./build
