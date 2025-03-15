@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,13 +13,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Debug Environment Variables
-      run: env | sort  # Debugging step
-
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '22'
+        node-version: '16'
 
     - name: Install dependencies
       run: npm install
@@ -31,19 +24,13 @@ jobs:
     - name: Build React app
       run: npm run build
 
+    # Updated login step using 'creds' input
     - name: Log in to Azure
       uses: azure/login@v1
       with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        auth-type: SERVICE_PRINCIPAL  # Forces Service Principal Authentication
+        creds: ${{ secrets.AZURE_CREDENTIALS }}  # Use a single JSON object containing all keys
+        auth-type: SERVICE_PRINCIPAL
+
+    # Optional: Verify login
     - name: Verify Azure Login
       run: az account show
-
-    - name: Deploy to Azure App Service
-      run: |
-        az webapp deploy --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-          --name ${{ secrets.AZURE_APP_NAME }} \
-          --src-path ./build
