@@ -31,7 +31,7 @@ jobs:
         client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        allow-no-subscriptions: true  # 🚀 Forces Service Principal authentication
+        auth-type: SERVICE_PRINCIPAL  # 🚀 Forces Service Principal authentication
 
     - name: Deploy to Azure App Service
       run: |
